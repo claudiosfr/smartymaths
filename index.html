@@ -2,7 +2,7 @@
 <html lang="it">
 <head>
   <meta charset="UTF-8" />
-  <title>Benvenuto – Attività interattive di matematica</title>
+  <title>SmartyMaths – Attività interattive di matematica</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <style>
     * {
@@ -21,154 +21,339 @@
     }
 
     .wrapper {
-      max-width: 900px;
+      max-width: 960px;
       width: 100%;
       padding: 24px 16px 40px;
     }
 
-    .card {
+    .card-main {
       background: #ffffff;
-      border-radius: 18px;
-      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
-      padding: 22px 18px 24px;
+      border-radius: 20px;
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.12);
+      padding: 22px 22px 26px;
+      display: grid;
+      grid-template-columns: minmax(0, 3fr) minmax(0, 2.5fr);
+      gap: 18px;
     }
 
-    h1 {
-      font-size: 1.7rem;
+    .hero-text h1 {
+      font-size: 1.9rem;
       margin: 0 0 0.4rem;
       color: #12355b;
     }
 
-    p.lead {
-      margin: 0;
+    .hero-text p {
+      margin: 0.1rem 0 0.7rem;
       font-size: 0.98rem;
-      color: #555;
-    }
-
-    .sections {
-      margin-top: 1.4rem;
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
-      gap: 16px;
-    }
-
-    .section-card {
-      background: #f8fafc;
-      border-radius: 14px;
-      padding: 14px 12px 16px;
-      border: 1px solid #dde2f0;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-    }
-
-    .section-title {
-      font-size: 1.05rem;
-      font-weight: 600;
-      margin-bottom: 4px;
-      color: #0d47a1;
-    }
-
-    .section-desc {
-      font-size: 0.9rem;
-      margin: 0 0 10px;
       color: #444;
     }
 
-    a.button-link {
+    .hero-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 10px;
+      border-radius: 999px;
+      background: #e3f2fd;
+      color: #0d47a1;
+      font-size: 0.8rem;
+      margin-bottom: 0.4rem;
+    }
+
+    .hero-pill span:first-child {
+      font-size: 1.1rem;
+    }
+
+    .hero-highlight {
+      margin-top: 0.4rem;
+      font-size: 0.9rem;
+      color: #555;
+    }
+
+    .hero-highlight strong {
+      color: #0d47a1;
+    }
+
+    .hero-actions {
+      margin-top: 0.9rem;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    a.btn-primary {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 9px 16px;
+      border-radius: 999px;
+      border: none;
+      background: #1259c3;
+      color: #ffffff;
+      font-size: 0.95rem;
+      font-weight: 500;
+      text-decoration: none;
+      box-shadow: 0 5px 14px rgba(0, 0, 0, 0.22);
+      transition: transform 0.08s ease, box-shadow 0.08s ease, background 0.15s;
+      gap: 6px;
+    }
+
+    a.btn-primary:hover {
+      background: #0d47a1;
+      transform: translateY(-1px);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
+    }
+
+    a.btn-ghost {
       display: inline-flex;
       align-items: center;
       justify-content: center;
       padding: 8px 14px;
       border-radius: 999px;
-      border: none;
-      background: #1259c3;
-      color: #ffffff;
+      border: 1px solid #cfd8dc;
+      background: #ffffff;
+      color: #37474f;
       font-size: 0.9rem;
-      font-weight: 500;
       text-decoration: none;
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.18);
-      transition: transform 0.08s ease, box-shadow 0.08s ease, background 0.15s;
-      margin-top: 4px;
+      gap: 6px;
     }
 
-    a.button-link:hover {
-      background: #0d47a1;
-      transform: translateY(-1px);
-      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.22);
+    a.btn-ghost:hover {
+      background: #eceff1;
     }
 
-    .tagline {
-      margin-top: 14px;
-      font-size: 0.85rem;
-      color: #666;
-      background: #fff8e1;
+    .hero-visual {
+      position: relative;
+      border-radius: 18px;
+      background: linear-gradient(145deg, #0d47a1, #42a5f5);
+      padding: 14px 14px 16px;
+      color: #e3f2fd;
+      overflow: hidden;
+    }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.15);
+      font-size: 0.8rem;
+      margin-bottom: 8px;
+    }
+
+    .hero-badge span:first-child {
+      font-size: 1.1rem;
+    }
+
+    .hero-visual h2 {
+      font-size: 1.15rem;
+      margin: 4px 0 4px;
+      color: #ffffff;
+    }
+
+    .hero-visual p {
+      font-size: 0.9rem;
+      margin: 0 0 10px;
+      color: #e1f5fe;
+    }
+
+    .number-line-mini {
+      margin-top: 10px;
+      background: rgba(13, 71, 161, 0.2);
+      border-radius: 999px;
       padding: 8px 10px;
-      border-radius: 10px;
-      border: 1px dashed #ffb300;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      overflow: hidden;
     }
 
-    .tagline strong {
-      color: #e65100;
+    .number-line-mini span {
+      font-variant-numeric: tabular-nums;
+      font-size: 0.85rem;
+      color: #e3f2fd;
     }
 
-    @media (max-width: 600px) {
-      .card {
-        padding: 18px 12px 20px;
+    .dot {
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: #ffeb3b;
+      box-shadow: 0 0 0 4px rgba(255, 235, 59, 0.4);
+      margin-left: auto;
+      margin-right: 2px;
+    }
+
+    .sections {
+      margin-top: 18px;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+      gap: 14px;
+    }
+
+    .section-card {
+      background: #ffffff;
+      border-radius: 14px;
+      padding: 12px 12px 14px;
+      border: 1px solid #e0e3ec;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .section-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .icon-circle {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.3rem;
+      background: #e3f2fd;
+      color: #0d47a1;
+    }
+
+    .section-title {
+      font-size: 0.98rem;
+      font-weight: 600;
+      color: #12355b;
+    }
+
+    .section-text {
+      font-size: 0.88rem;
+      color: #555;
+      margin-top: 2px;
+    }
+
+    .section-footer {
+      margin-top: 4px;
+      font-size: 0.78rem;
+      color: #777;
+    }
+
+    @media (max-width: 720px) {
+      .card-main {
+        grid-template-columns: minmax(0, 1fr);
+        padding: 18px 14px 20px;
       }
-      h1 {
-        font-size: 1.4rem;
+
+      .hero-text h1 {
+        font-size: 1.55rem;
       }
     }
   </style>
 </head>
 <body>
   <div class="wrapper">
-    <div class="card">
-      <h1>Benvenuto nelle attività interattive di matematica</h1>
-      <p class="lead">
-        Qui troverai piccole attività visuali per capire meglio i concetti di base
-        (numeri naturali, numeri negativi/relativi, operazioni…).
-        Puoi aprirle insieme al tuo insegnante durante le lezioni online.
-      </p>
-
-      <div class="sections">
-        <!-- Sezione 1: numeri naturali & negativi -->
-        <div class="section-card">
-          <div>
-            <div class="section-title">Numeri naturali e numeri negativi</div>
-            <p class="section-desc">
-              Attività con la linea dei numeri per vedere come ci si sposta a destra
-              (+) e a sinistra (–), come se aggiungessi o togliessi peso in palestra
-              o cambiassi la temperatura.
-            </p>
-          </div>
-          <!-- IMPORTANTE: il link deve corrispondere al nome del file HTML che hai salvato -->
-          <a class="button-link" href="numeri_relativi_linea_numeri.html">
-            Apri l’attività &rarr;
-          </a>
+    <main class="card-main">
+      <section class="hero-text">
+        <div class="hero-pill">
+          <span>📊</span>
+          <span>Allenamento guidato di matematica</span>
         </div>
 
-        <!-- Sezione 2: futura (placeholder, da riempire in seguito) -->
-        <div class="section-card">
-          <div>
-            <div class="section-title">Prossime attività</div>
-            <p class="section-desc">
-              Qui potrai aggiungere altre attività: operazioni con i numeri relativi,
-              problemi con la temperatura, esercizi sulle quattro operazioni, ecc.
-            </p>
-          </div>
-          <a class="button-link" href="#">
-            In arrivo…
+        <h1>Benvenuto su SmartyMaths</h1>
+        <p>
+          Qui trovi attività interattive per capire meglio i numeri naturali,
+          i numeri negativi (relativi) e le operazioni di base.
+        </p>
+
+        <p class="hero-highlight">
+          Scegli un’attività, segui i passaggi e osserva cosa succede
+          <strong>sulla linea dei numeri</strong>.
+        </p>
+
+        <div class="hero-actions">
+          <a class="btn-primary" href="linea_numeri_interattiva.html">
+            <span>➤</span>
+            <span>Inizia dai numeri positivi e negativi</span>
+          </a>
+          <a class="btn-ghost" href="#attivita">
+            <span>📚</span>
+            <span>Vedi tutte le attività</span>
           </a>
         </div>
-      </div>
+      </section>
 
-      <div class="tagline">
-        <strong>claudiosfr(c)</strong>
-      </div>
-    </div>
+      <aside class="hero-visual" aria-hidden="true">
+        <div class="hero-badge">
+          <span>🎯</span>
+          <span>Allenamento passo per passo</span>
+        </div>
+        <h2>Numeri come movimenti</h2>
+        <p>
+          Immagina una linea: andare a destra è come aumentare il peso in palestra
+          oppure la temperatura. Andare a sinistra è come toglierlo.
+        </p>
+
+        <div class="number-line-mini">
+          <span>-3</span>
+          <span>-2</span>
+          <span>-1</span>
+          <span>0</span>
+          <span>+1</span>
+          <span>+2</span>
+          <span>+3</span>
+          <div class="dot"></div>
+        </div>
+
+        <p style="font-size:0.8rem; margin-top:10px; color:#e1f5fe;">
+          Premi i pulsanti nell’attività per spostare il punto e osservare cosa
+          succede al numero.
+        </p>
+      </aside>
+    </main>
+
+    <section id="attivita" class="sections">
+      <article class="section-card">
+        <div class="section-header">
+          <div class="icon-circle">➕</div>
+          <div class="section-title">Numeri naturali e numeri negativi</div>
+        </div>
+        <p class="section-text">
+          Attività interattiva con la linea dei numeri. Vedi come cambiano i valori
+          quando aggiungi o togli “peso”: numeri positivi a destra, numeri negativi a sinistra.
+        </p>
+        <div class="section-footer">
+          Suggerito come primo passo.
+        </div>
+      </article>
+
+      <article class="section-card">
+        <div class="section-header">
+          <div class="icon-circle">🧮</div>
+          <div class="section-title">Somma e sottrazione con numeri negativi</div>
+        </div>
+        <p class="section-text">
+          Prossima attività: esercizi guidati per vedere cosa succede quando sommi
+          o sottrai numeri con segno più e segno meno.
+        </p>
+        <div class="section-footer">
+          In arrivo.
+        </div>
+      </article>
+
+      <article class="section-card">
+        <div class="section-header">
+          <div class="icon-circle">🏋️‍♂️</div>
+          <div class="section-title">Esempi dalla palestra e dalla vita reale</div>
+        </div>
+        <p class="section-text">
+          Situazioni quotidiane per collegare i numeri negativi a cose concrete:
+          pesi sul bilanciere, temperatura, saldi sul conto.
+        </p>
+        <div class="section-footer">
+          In preparazione.
+        </div>
+      </article>
+    </section>
   </div>
 </body>
-
 </html>
