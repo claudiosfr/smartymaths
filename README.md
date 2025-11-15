@@ -1,3 +1,3 @@
 # smartymaths
 Smarty Maths
-It's student's oriented project for maths teaching.
+It's a student's oriented project for maths teaching.
