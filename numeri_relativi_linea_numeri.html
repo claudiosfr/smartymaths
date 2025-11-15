@@ -2,7 +2,8 @@
 <html lang="it">
 <head>
   <meta charset="UTF-8" />
-  <title>Linea dei numeri interattiva</title>
+  <title>Numeri naturali e numeri negativi</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <style>
     * {
       box-sizing: border-box;
@@ -30,15 +31,8 @@
       color: #12355b;
     }
 
-    h2 {
-      font-size: 1.1rem;
-      margin-top: 1.4rem;
-      margin-bottom: 0.4rem;
-      color: #333;
-    }
-
     p {
-      margin: 0.25rem 0 0.4rem;
+      margin: 0.25rem 0 0.5rem;
       line-height: 1.4;
     }
 
@@ -54,7 +48,7 @@
       display: flex;
       flex-wrap: wrap;
       gap: 8px;
-      margin: 8px 0 4px;
+      margin: 10px 0 8px;
       align-items: center;
     }
 
@@ -88,7 +82,7 @@
     }
 
     .current-value {
-      font-size: 1.1rem;
+      font-size: 1.05rem;
       font-weight: 600;
       margin-top: 4px;
     }
@@ -111,16 +105,6 @@
       border: 1px solid #dde2f0;
     }
 
-    .note-docente {
-      margin-top: 0.8rem;
-      font-size: 0.9rem;
-      color: #555;
-      background: #fff8e1;
-      border-radius: 10px;
-      padding: 10px 12px;
-      border: 1px dashed #ffb300;
-    }
-
     .pill {
       display: inline-block;
       padding: 2px 8px;
@@ -139,6 +123,21 @@
       color: #b71c1c;
     }
 
+    .info-box {
+      margin-top: 10px;
+      font-size: 0.9rem;
+      background: #f8fafc;
+      border-radius: 10px;
+      padding: 10px 12px;
+      border: 1px solid #dde2f0;
+    }
+
+    .info-box h2 {
+      font-size: 1rem;
+      margin: 0 0 4px;
+      color: #12355b;
+    }
+
     @media (max-width: 600px) {
       h1 {
         font-size: 1.35rem;
@@ -155,20 +154,24 @@
 </head>
 <body>
   <div class="container">
-    <h1>Linea dei numeri interattiva</h1>
+    <h1>Numeri naturali e numeri negativi</h1>
     <p>
-      Questo strumento serve a far vedere come funzionano i numeri <strong>positivi</strong> e <strong>negativi</strong>.
-      Muovendo il pallino sulla linea puoi spiegare allo studente che cosa succede quando:
+      In questa attività puoi vedere come funzionano i numeri
+      <strong>positivi</strong> e <strong>negativi</strong> sulla linea dei numeri.
     </p>
-    <ul>
-      <li><strong>aggiunge peso</strong> (numeri positivi, si va a destra);</li>
-      <li><strong>toglie peso</strong> (numeri negativi, si va a sinistra).</li>
-    </ul>
+    <p>
+      Immagina che questo numero sia il <strong>peso sul bilanciere</strong>
+      o la <strong>temperatura</strong>:
+      <br />
+      andare a destra è come <strong>aumentare</strong>, andare a sinistra è come
+      <strong>diminuire</strong>.
+    </p>
 
     <div class="card">
       <h2>Muovi il punto sulla linea</h2>
       <p>
-        Immagina che questo numero rappresenti il peso sul bilanciere, o la temperatura, o il tuo "livello di energia".
+        Usa i pulsanti per spostare il punto. Osserva come cambia il numero
+        e dove si trova rispetto allo zero.
       </p>
 
       <div class="controls">
@@ -182,17 +185,35 @@
       <p class="current-value">
         Valore attuale:
         <span id="currentValue">0</span>
-        <span class="pill plus">positivo = a destra</span>
-        <span class="pill minus">negativo = a sinistra</span>
+      </p>
+      <p>
+        <span class="pill plus">positivo → a destra</span>
+        <span class="pill minus">negativo → a sinistra</span>
       </p>
 
       <canvas id="numberLine" width="820" height="160"></canvas>
 
-      <div class="note-docente">
-        <strong>Idea didattica:</strong> chiedi allo studente frasi come
-        "Se aggiungo 5 kg, dove va il punto?" oppure
-        "Se tolgo 3 kg, il numero aumenta o diminuisce?".
-        Puoi anche collegarlo alla temperatura (da +3° a −2°, ecc.).
+      <div class="info-box">
+        <h2>Cosa stai vedendo</h2>
+        <p>
+          I numeri <strong>a destra di 0</strong> sono
+          <strong>positivi</strong> (es. +1, +2, +3…).
+        </p>
+        <p>
+          I numeri <strong>a sinistra di 0</strong> sono
+          <strong>negativi</strong> (es. −1, −2, −3…).
+        </p>
+        <p>
+          Lo zero è il punto centrale: non è né positivo né negativo.
+        </p>
+        <p style="margin-top:8px;">
+          Per ora conosci:
+          <br />
+          • l’insieme dei <strong>numeri naturali</strong> N = {0, 1, 2, 3, …}
+          <br />
+          • l’insieme dei <strong>numeri relativi</strong>
+          (positivi, negativi e zero), che spesso si indica con Z.
+        </p>
       </div>
     </div>
   </div>
@@ -245,7 +266,7 @@
 
         ctx.lineWidth = n === 0 ? 2.2 : 1.4;
 
-        // Tacche verticali
+        // Tacca verticale
         ctx.beginPath();
         const tickHeight = n === 0 ? 14 : 9;
         ctx.moveTo(x, y - tickHeight / 2);
@@ -264,7 +285,8 @@
       const markerY = y;
 
       ctx.beginPath();
-      ctx.fillStyle = current < 0 ? "#e53935" : current > 0 ? "#1e88e5" : "#6d4c41";
+      ctx.fillStyle =
+        current < 0 ? "#e53935" : current > 0 ? "#1e88e5" : "#6d4c41";
       ctx.strokeStyle = "#212121";
       ctx.lineWidth = 1.5;
       ctx.arc(markerX, markerY, 8, 0, Math.PI * 2);
@@ -272,7 +294,8 @@
       ctx.stroke();
 
       // Valore sopra il punto
-      ctx.font = "15px system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif";
+      ctx.font =
+        "15px system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif";
       ctx.textAlign = "center";
       ctx.textBaseline = "bottom";
       ctx.fillStyle = "#212121";
