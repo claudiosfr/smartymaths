@@ -2,7 +2,7 @@
 <html lang="it">
 <head>
   <meta charset="UTF-8" />
-  <title>Numeri naturali e numeri negativi</title>
+  <title>Somma e sottrazione con numeri relativi</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <style>
     * {
@@ -19,7 +19,7 @@
       justify-content: center;
     }
 
-    .container {
+    .container {  
       max-width: 900px;
       width: 100%;
       padding: 24px 16px 40px;
@@ -44,12 +44,25 @@
       margin-top: 1rem;
     }
 
-    .controls {
+    .inputs-row {
       display: flex;
       flex-wrap: wrap;
-      gap: 8px;
-      margin: 10px 0 8px;
+      gap: 10px;
+      margin: 10px 0;
       align-items: center;
+    }
+
+    label {
+      font-size: 0.9rem;
+    }
+
+    input[type="number"] {
+      width: 80px;
+      padding: 6px 8px;
+      border-radius: 8px;
+      border: 1px solid #cfd8dc;
+      font-size: 0.95rem;
+      font-variant-numeric: tabular-nums;
     }
 
     button {
@@ -81,19 +94,11 @@
       box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
     }
 
-    .current-value {
-      font-size: 1.05rem;
-      font-weight: 600;
-      margin-top: 4px;
-    }
-
-    .current-value span {
-      font-variant-numeric: tabular-nums;
-      padding: 2px 6px;
-      border-radius: 6px;
-      background: #eef3ff;
-      color: #0d47a1;
-      margin-left: 4px;
+    .buttons-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin: 8px 0 4px;
     }
 
     canvas {
@@ -102,6 +107,31 @@
       max-width: 820px;
       border-radius: 10px;
       background: #fafbff;
+      border: 1px solid #dde2f0;
+    }
+
+    .result {
+      margin-top: 10px;
+      font-size: 1rem;
+      font-weight: 600;
+    }
+
+    .result span {
+      font-variant-numeric: tabular-nums;
+      padding: 2px 6px;
+      border-radius: 6px;
+      background: #eef3ff;
+      color: #0d47a1;
+      margin-left: 4px;
+    }
+
+    .explanation {
+      margin-top: 6px;
+      font-size: 0.9rem;
+      color: #444;
+      background: #f8fafc;
+      border-radius: 10px;
+      padding: 8px 10px;
       border: 1px solid #dde2f0;
     }
 
@@ -123,21 +153,6 @@
       color: #b71c1c;
     }
 
-    .info-box {
-      margin-top: 10px;
-      font-size: 0.9rem;
-      background: #f8fafc;
-      border-radius: 10px;
-      padding: 10px 12px;
-      border: 1px solid #dde2f0;
-    }
-
-    .info-box h2 {
-      font-size: 1rem;
-      margin: 0 0 4px;
-      color: #12355b;
-    }
-
     @media (max-width: 600px) {
       h1 {
         font-size: 1.35rem;
@@ -146,7 +161,7 @@
         padding: 14px 10px 16px;
       }
       button {
-        flex: 1 1 calc(33% - 8px);
+        flex: 1 1 calc(50% - 8px);
         text-align: center;
       }
     }
@@ -154,66 +169,50 @@
 </head>
 <body>
   <div class="container">
-    <h1>Numeri naturali e numeri negativi</h1>
+    <h1>Somma e sottrazione con numeri relativi</h1>
     <p>
-      In questa attività puoi vedere come funzionano i numeri
-      <strong>positivi</strong> e <strong>negativi</strong> sulla linea dei numeri.
+      Qui puoi allenarti con la <strong>somma</strong> e la
+      <strong>sottrazione</strong> di numeri con il segno.
     </p>
     <p>
-      Immagina che questo numero sia il <strong>peso sul bilanciere</strong>
-      o la <strong>temperatura</strong>:
-      <br />
-      andare a destra è come <strong>aumentare</strong>, andare a sinistra è come
-      <strong>diminuire</strong>.
+      Scegli due numeri (positivi o negativi), poi premi
+      <strong>Somma</strong> oppure <strong>Sottrazione</strong>.
+      Guarda il risultato e come si posiziona sulla linea.
     </p>
 
     <div class="card">
-      <h2>Muovi il punto sulla linea</h2>
-      <p>
-        Usa i pulsanti per spostare il punto. Osserva come cambia il numero
-        e dove si trova rispetto allo zero.
-      </p>
+      <h2>Imposta i numeri</h2>
 
-      <div class="controls">
-        <button type="button" data-step="-5">−5</button>
-        <button type="button" data-step="-1">−1</button>
-        <button type="button" data-step="1">+1</button>
-        <button type="button" data-step="5">+5</button>
-        <button type="button" id="reset" class="secondary">Torna a 0</button>
+      <div class="inputs-row">
+        <div>
+          <label for="a"><strong>Primo numero (a):</strong></label><br />
+          <input type="number" id="a" value="2" min="-10" max="10" />
+        </div>
+        <div>
+          <label for="b"><strong>Secondo numero (b):</strong></label><br />
+          <input type="number" id="b" value="-3" min="-10" max="10" />
+        </div>
       </div>
 
-      <p class="current-value">
-        Valore attuale:
-        <span id="currentValue">0</span>
+      <div class="buttons-row">
+        <button type="button" id="btnSomma">Calcola somma (a + b)</button>
+        <button type="button" id="btnSottrazione">Calcola sottrazione (a − b)</button>
+        <button type="button" id="btnReset" class="secondary">Torna a 0</button>
+      </div>
+
+      <p class="result">
+        Risultato:
+        <span id="risultato">0</span>
       </p>
       <p>
         <span class="pill plus">positivo → a destra</span>
-        <span class="pill minus">negativo → a sinistra</span>
+        <span class="pill.minus">negativo → a sinistra</span>
       </p>
 
-      <canvas id="numberLine" width="820" height="160"></canvas>
+      <canvas id="numberLine" width="820" height="170"></canvas>
 
-      <div class="info-box">
-        <h2>Cosa stai vedendo</h2>
-        <p>
-          I numeri <strong>a destra di 0</strong> sono
-          <strong>positivi</strong> (es. +1, +2, +3…).
-        </p>
-        <p>
-          I numeri <strong>a sinistra di 0</strong> sono
-          <strong>negativi</strong> (es. −1, −2, −3…).
-        </p>
-        <p>
-          Lo zero è il punto centrale: non è né positivo né negativo.
-        </p>
-        <p style="margin-top:8px;">
-          Per ora conosci:
-          <br />
-          • l’insieme dei <strong>numeri naturali</strong> N = {0, 1, 2, 3, …}
-          <br />
-          • l’insieme dei <strong>numeri relativi</strong>
-          (positivi, negativi e zero), che spesso si indica con Z.
-        </p>
+      <div class="explanation" id="explanation">
+        Scegli due numeri e premi uno dei pulsanti per vedere il risultato.
       </div>
     </div>
   </div>
@@ -221,11 +220,15 @@
   <script>
     const canvas = document.getElementById("numberLine");
     const ctx = canvas.getContext("2d");
-    const currentValueSpan = document.getElementById("currentValue");
-    const buttons = document.querySelectorAll("button[data-step]");
-    const resetBtn = document.getElementById("reset");
 
-    // Intervallo di numeri visualizzati sulla linea
+    const inputA = document.getElementById("a");
+    const inputB = document.getElementById("b");
+    const btnSomma = document.getElementById("btnSomma");
+    const btnSottrazione = document.getElementById("btnSottrazione");
+    const btnReset = document.getElementById("btnReset");
+    const spanRisultato = document.getElementById("risultato");
+    const explanation = document.getElementById("explanation");
+
     const minN = -10;
     const maxN = 10;
     let current = 0;
@@ -251,7 +254,7 @@
       ctx.lineTo(canvas.width - padding, y);
       ctx.stroke();
 
-      // Tacche e numeri da minN a maxN
+      // Tacche e numeri
       ctx.font = "14px system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif";
       ctx.textAlign = "center";
       ctx.textBaseline = "top";
@@ -259,28 +262,25 @@
       for (let n = minN; n <= maxN; n++) {
         const x = xFor(n);
 
-        // Colore per negativi, zero, positivi
-        if (n < 0) ctx.strokeStyle = "#c62828"; // rosso
-        else if (n > 0) ctx.strokeStyle = "#1565c0"; // blu
-        else ctx.strokeStyle = "#424242"; // zero
+        if (n < 0) ctx.strokeStyle = "#c62828";
+        else if (n > 0) ctx.strokeStyle = "#1565c0";
+        else ctx.strokeStyle = "#424242";
 
         ctx.lineWidth = n === 0 ? 2.2 : 1.4;
 
-        // Tacca verticale
         ctx.beginPath();
         const tickHeight = n === 0 ? 14 : 9;
         ctx.moveTo(x, y - tickHeight / 2);
         ctx.lineTo(x, y + tickHeight / 2);
         ctx.stroke();
 
-        // Etichette numeriche (non tutte, per non affollare)
         if (n % 2 === 0 || n === 0) {
           ctx.fillStyle = n < 0 ? "#b71c1c" : n > 0 ? "#0d47a1" : "#000000";
           ctx.fillText(n.toString(), x, y + 12);
         }
       }
 
-      // Punto corrente
+      // Punto del risultato
       const markerX = xFor(current);
       const markerY = y;
 
@@ -293,7 +293,6 @@
       ctx.fill();
       ctx.stroke();
 
-      // Valore sopra il punto
       ctx.font =
         "15px system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif";
       ctx.textAlign = "center";
@@ -302,28 +301,73 @@
       ctx.fillText(current.toString(), markerX, markerY - 12);
     }
 
-    function updateValue(delta) {
-      current += delta;
-      if (current < minN) current = minN;
-      if (current > maxN) current = maxN;
-      currentValueSpan.textContent = current.toString();
+    function computeAndExplain(type) {
+      let a = parseInt(inputA.value, 10);
+      let b = parseInt(inputB.value, 10);
+
+      if (isNaN(a)) a = 0;
+      if (isNaN(b)) b = 0;
+
+      // Limitiamo comunque al range visualizzato
+      if (a < minN) a = minN;
+      if (a > maxN) a = maxN;
+      if (b < minN) b = minN;
+      if (b > maxN) b = maxN;
+
+      inputA.value = a;
+      inputB.value = b;
+
+      let result;
+      let text = "";
+
+      if (type === "somma") {
+        result = a + b;
+        text += `Hai calcolato: ${a} + (${b}) = ${result}. `;
+      } else {
+        result = a - b;
+        text += `Hai calcolato: ${a} − (${b}) = ${result}. `;
+      }
+
+      // Spiegazione semplice sui segni
+      const signA = Math.sign(a);
+      const signB = Math.sign(b);
+
+      if (type === "somma") {
+        if (signA === 0 && signB === 0) {
+          text += "Tutti e due i numeri sono 0.";
+        } else if (signA === signB) {
+          text += "Hanno lo stesso segno: sommi i numeri senza il segno e mantieni quel segno.";
+        } else {
+          text += "Hanno segno diverso: confronti le distanze da 0 e prendi il segno del numero più “forte”.";
+        }
+      } else {
+        text += "Nella sottrazione puoi pensare che cambi il segno al secondo numero e poi fai una somma.";
+      }
+
+      if (result < minN) result = minN;
+      if (result > maxN) result = maxN;
+
+      current = result;
+      spanRisultato.textContent = result.toString();
+      explanation.textContent = text;
       drawNumberLine();
     }
 
-    buttons.forEach((btn) => {
-      btn.addEventListener("click", () => {
-        const step = parseInt(btn.getAttribute("data-step"), 10);
-        updateValue(step);
-      });
+    btnSomma.addEventListener("click", () => {
+      computeAndExplain("somma");
     });
 
-    resetBtn.addEventListener("click", () => {
+    btnSottrazione.addEventListener("click", () => {
+      computeAndExplain("sottrazione");
+    });
+
+    btnReset.addEventListener("click", () => {
       current = 0;
-      currentValueSpan.textContent = "0";
+      spanRisultato.textContent = "0";
+      explanation.textContent = "Scegli due numeri e premi uno dei pulsanti per vedere il risultato.";
       drawNumberLine();
     });
 
-    // Primo disegno
     drawNumberLine();
   </script>
 </body>
