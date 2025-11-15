@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <title>Linea dei numeri interattiva</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      margin: 0;
+      padding: 0;
+      background: #f5f5f7;
+      color: #222;
+      display: flex;
+      justify-content: center;
+    }
+
+    .container {
+      max-width: 900px;
+      width: 100%;
+      padding: 24px 16px 40px;
+    }
+
+    h1 {
+      font-size: 1.6rem;
+      margin-bottom: 0.25rem;
+      color: #12355b;
+    }
+
+    h2 {
+      font-size: 1.1rem;
+      margin-top: 1.4rem;
+      margin-bottom: 0.4rem;
+      color: #333;
+    }
+
+    p {
+      margin: 0.25rem 0 0.4rem;
+      line-height: 1.4;
+    }
+
+    .card {
+      background: #ffffff;
+      border-radius: 14px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.06);
+      padding: 18px 16px 20px;
+      margin-top: 1rem;
+    }
+
+    .controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin: 8px 0 4px;
+      align-items: center;
+    }
+
+    button {
+      border-radius: 999px;
+      border: none;
+      padding: 8px 14px;
+      font-size: 0.95rem;
+      cursor: pointer;
+      background: #1259c3;
+      color: white;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+      transition: transform 0.08s ease, box-shadow 0.08s ease, background 0.15s;
+    }
+
+    button.secondary {
+      background: #e0e0e7;
+      color: #222;
+      box-shadow: none;
+    }
+
+    button:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.16);
+      background: #0d47a1;
+    }
+
+    button.secondary:hover {
+      background: #d0d0dd;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+    }
+
+    .current-value {
+      font-size: 1.1rem;
+      font-weight: 600;
+      margin-top: 4px;
+    }
+
+    .current-value span {
+      font-variant-numeric: tabular-nums;
+      padding: 2px 6px;
+      border-radius: 6px;
+      background: #eef3ff;
+      color: #0d47a1;
+      margin-left: 4px;
+    }
+
+    canvas {
+      margin-top: 10px;
+      width: 100%;
+      max-width: 820px;
+      border-radius: 10px;
+      background: #fafbff;
+      border: 1px solid #dde2f0;
+    }
+
+    .note-docente {
+      margin-top: 0.8rem;
+      font-size: 0.9rem;
+      color: #555;
+      background: #fff8e1;
+      border-radius: 10px;
+      padding: 10px 12px;
+      border: 1px dashed #ffb300;
+    }
+
+    .pill {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 999px;
+      font-size: 0.8rem;
+      margin-top: 2px;
+    }
+
+    .pill.plus {
+      background: #e3f2fd;
+      color: #0d47a1;
+    }
+
+    .pill.minus {
+      background: #ffebee;
+      color: #b71c1c;
+    }
+
+    @media (max-width: 600px) {
+      h1 {
+        font-size: 1.35rem;
+      }
+      .card {
+        padding: 14px 10px 16px;
+      }
+      button {
+        flex: 1 1 calc(33% - 8px);
+        text-align: center;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Linea dei numeri interattiva</h1>
+    <p>
+      Questo strumento serve a far vedere come funzionano i numeri <strong>positivi</strong> e <strong>negativi</strong>.
+      Muovendo il pallino sulla linea puoi spiegare allo studente che cosa succede quando:
+    </p>
+    <ul>
+      <li><strong>aggiunge peso</strong> (numeri positivi, si va a destra);</li>
+      <li><strong>toglie peso</strong> (numeri negativi, si va a sinistra).</li>
+    </ul>
+
+    <div class="card">
+      <h2>Muovi il punto sulla linea</h2>
+      <p>
+        Immagina che questo numero rappresenti il peso sul bilanciere, o la temperatura, o il tuo "livello di energia".
+      </p>
+
+      <div class="controls">
+        <button type="button" data-step="-5">−5</button>
+        <button type="button" data-step="-1">−1</button>
+        <button type="button" data-step="1">+1</button>
+        <button type="button" data-step="5">+5</button>
+        <button type="button" id="reset" class="secondary">Torna a 0</button>
+      </div>
+
+      <p class="current-value">
+        Valore attuale:
+        <span id="currentValue">0</span>
+        <span class="pill plus">positivo = a destra</span>
+        <span class="pill minus">negativo = a sinistra</span>
+      </p>
+
+      <canvas id="numberLine" width="820" height="160"></canvas>
+
+      <div class="note-docente">
+        <strong>Idea didattica:</strong> chiedi allo studente frasi come
+        "Se aggiungo 5 kg, dove va il punto?" oppure
+        "Se tolgo 3 kg, il numero aumenta o diminuisce?".
+        Puoi anche collegarlo alla temperatura (da +3° a −2°, ecc.).
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const canvas = document.getElementById("numberLine");
+    const ctx = canvas.getContext("2d");
+    const currentValueSpan = document.getElementById("currentValue");
+    const buttons = document.querySelectorAll("button[data-step]");
+    const resetBtn = document.getElementById("reset");
+
+    // Intervallo di numeri visualizzati sulla linea
+    const minN = -10;
+    const maxN = 10;
+    let current = 0;
+
+    function xFor(n) {
+      const padding = 60;
+      const usableWidth = canvas.width - padding * 2;
+      const ratio = (n - minN) / (maxN - minN);
+      return padding + ratio * usableWidth;
+    }
+
+    function drawNumberLine() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      const padding = 60;
+      const y = canvas.height / 2;
+
+      // Linea principale
+      ctx.strokeStyle = "#424242";
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(padding, y);
+      ctx.lineTo(canvas.width - padding, y);
+      ctx.stroke();
+
+      // Tacche e numeri da minN a maxN
+      ctx.font = "14px system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif";
+      ctx.textAlign = "center";
+      ctx.textBaseline = "top";
+
+      for (let n = minN; n <= maxN; n++) {
+        const x = xFor(n);
+
+        // Colore per negativi, zero, positivi
+        if (n < 0) ctx.strokeStyle = "#c62828"; // rosso
+        else if (n > 0) ctx.strokeStyle = "#1565c0"; // blu
+        else ctx.strokeStyle = "#424242"; // zero
+
+        ctx.lineWidth = n === 0 ? 2.2 : 1.4;
+
+        // Tacche verticali
+        ctx.beginPath();
+        const tickHeight = n === 0 ? 14 : 9;
+        ctx.moveTo(x, y - tickHeight / 2);
+        ctx.lineTo(x, y + tickHeight / 2);
+        ctx.stroke();
+
+        // Etichette numeriche (non tutte, per non affollare)
+        if (n % 2 === 0 || n === 0) {
+          ctx.fillStyle = n < 0 ? "#b71c1c" : n > 0 ? "#0d47a1" : "#000000";
+          ctx.fillText(n.toString(), x, y + 12);
+        }
+      }
+
+      // Punto corrente
+      const markerX = xFor(current);
+      const markerY = y;
+
+      ctx.beginPath();
+      ctx.fillStyle = current < 0 ? "#e53935" : current > 0 ? "#1e88e5" : "#6d4c41";
+      ctx.strokeStyle = "#212121";
+      ctx.lineWidth = 1.5;
+      ctx.arc(markerX, markerY, 8, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.stroke();
+
+      // Valore sopra il punto
+      ctx.font = "15px system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif";
+      ctx.textAlign = "center";
+      ctx.textBaseline = "bottom";
+      ctx.fillStyle = "#212121";
+      ctx.fillText(current.toString(), markerX, markerY - 12);
+    }
+
+    function updateValue(delta) {
+      current += delta;
+      if (current < minN) current = minN;
+      if (current > maxN) current = maxN;
+      currentValueSpan.textContent = current.toString();
+      drawNumberLine();
+    }
+
+    buttons.forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const step = parseInt(btn.getAttribute("data-step"), 10);
+        updateValue(step);
+      });
+    });
+
+    resetBtn.addEventListener("click", () => {
+      current = 0;
+      currentValueSpan.textContent = "0";
+      drawNumberLine();
+    });
+
+    // Primo disegno
+    drawNumberLine();
+  </script>
+</body>
+</html>
