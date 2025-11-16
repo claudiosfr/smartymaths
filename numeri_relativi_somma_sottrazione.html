@@ -19,7 +19,7 @@
       justify-content: center;
     }
 
-    .container {  
+    .container {
       max-width: 900px;
       width: 100%;
       padding: 24px 16px 40px;
@@ -65,6 +65,13 @@
       font-variant-numeric: tabular-nums;
     }
 
+    .buttons-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin: 8px 0 4px;
+    }
+
     button {
       border-radius: 999px;
       border: none;
@@ -92,13 +99,6 @@
     button.secondary:hover {
       background: #d0d0dd;
       box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
-    }
-
-    .buttons-row {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      margin: 8px 0 4px;
     }
 
     canvas {
@@ -209,7 +209,7 @@
         <span class="pill.minus">negativo → a sinistra</span>
       </p>
 
-      <canvas id="numberLine" width="820" height="170"></canvas>
+      <canvas id="numberLine" width="820" height="190"></canvas>
 
       <div class="explanation" id="explanation">
         Scegli due numeri e premi uno dei pulsanti per vedere il risultato.
@@ -229,8 +229,10 @@
     const spanRisultato = document.getElementById("risultato");
     const explanation = document.getElementById("explanation");
 
-    const minN = -10;
-    const maxN = 10;
+    // Intervallo della linea: deve contenere tutti i risultati possibili
+    // con a, b in [-10, +10] → risultato in [-20, +20].
+    const minN = -20;
+    const maxN = 20;
     let current = 0;
 
     function xFor(n) {
@@ -274,7 +276,8 @@
         ctx.lineTo(x, y + tickHeight / 2);
         ctx.stroke();
 
-        if (n % 2 === 0 || n === 0) {
+        // Mostro solo i multipli di 5 per non affollare
+        if (n % 5 === 0 || n === 0) {
           ctx.fillStyle = n < 0 ? "#b71c1c" : n > 0 ? "#0d47a1" : "#000000";
           ctx.fillText(n.toString(), x, y + 12);
         }
@@ -308,11 +311,12 @@
       if (isNaN(a)) a = 0;
       if (isNaN(b)) b = 0;
 
-      // Limitiamo comunque al range visualizzato
-      if (a < minN) a = minN;
-      if (a > maxN) a = maxN;
-      if (b < minN) b = minN;
-      if (b > maxN) b = maxN;
+      // limiti degli input: restano -10 / +10,
+      // così il risultato è sempre dentro -20 / +20.
+      if (a < -10) a = -10;
+      if (a > 10) a = 10;
+      if (b < -10) b = -10;
+      if (b > 10) b = 10;
 
       inputA.value = a;
       inputB.value = b;
@@ -328,7 +332,6 @@
         text += `Hai calcolato: ${a} − (${b}) = ${result}. `;
       }
 
-      // Spiegazione semplice sui segni
       const signA = Math.sign(a);
       const signB = Math.sign(b);
 
@@ -344,6 +347,8 @@
         text += "Nella sottrazione puoi pensare che cambi il segno al secondo numero e poi fai una somma.";
       }
 
+      // ora il risultato NON viene limitato a ±10,
+      // ma solo al range della linea: [-20, +20]
       if (result < minN) result = minN;
       if (result > maxN) result = maxN;
 
