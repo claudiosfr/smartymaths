@@ -1,379 +1,488 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-  <meta charset="UTF-8" />
-  <title>Somma e sottrazione con numeri relativi</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <style>
-    * {
-      box-sizing: border-box;
-    }
+    <meta charset="UTF-8" />
+    <title>SmartyMaths - Somma e sottrazione con i numeri relativi</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    body {
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      margin: 0;
-      padding: 0;
-      background: #f5f5f7;
-      color: #222;
-      display: flex;
-      justify-content: center;
-    }
+    <!-- Bootstrap 5.3 -->
+    <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+        rel="stylesheet"
+        integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH"
+        crossorigin="anonymous"
+    />
 
-    .container {
-      max-width: 900px;
-      width: 100%;
-      padding: 24px 16px 40px;
-    }
+    <style>
+        :root {
+            --bg-page: #f6f7fb;
+            --card-bg: #ffffff;
+            --accent: #2b6cb0;
+            --accent-soft: #ebf4ff;
+            --error: #e53e3e;
+            --ok: #38a169;
+            --text-main: #1a202c;
+            --text-soft: #4a5568;
+        }
 
-    h1 {
-      font-size: 1.6rem;
-      margin-bottom: 0.25rem;
-      color: #12355b;
-    }
+        body {
+            background: var(--bg-page);
+            color: var(--text-main);
+        }
 
-    p {
-      margin: 0.25rem 0 0.5rem;
-      line-height: 1.4;
-    }
+        .sm-card {
+            background: var(--card-bg);
+            border-radius: 0.75rem;
+            padding: 1.2rem 1.4rem;
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.06);
+        }
 
-    .card {
-      background: #ffffff;
-      border-radius: 14px;
-      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.06);
-      padding: 18px 16px 20px;
-      margin-top: 1rem;
-    }
+        .sm-card h2 {
+            font-size: 1.15rem;
+            margin-top: 0;
+            margin-bottom: 0.6rem;
+        }
 
-    .inputs-row {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      margin: 10px 0;
-      align-items: center;
-    }
+        .hint {
+            font-size: 0.9rem;
+            color: var(--text-soft);
+            margin-bottom: 0.8rem;
+        }
 
-    label {
-      font-size: 0.9rem;
-    }
+        label {
+            font-size: 0.9rem;
+            margin-bottom: 0.25rem;
+        }
 
-    input[type="number"] {
-      width: 80px;
-      padding: 6px 8px;
-      border-radius: 8px;
-      border: 1px solid #cfd8dc;
-      font-size: 0.95rem;
-      font-variant-numeric: tabular-nums;
-    }
+        input[type="number"], select {
+            font-size: 1rem;
+            border-radius: 0.45rem;
+        }
 
-    .buttons-row {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      margin: 8px 0 4px;
-    }
+        input[type="number"]:focus,
+        select:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 0.15rem var(--accent-soft);
+        }
 
-    button {
-      border-radius: 999px;
-      border: none;
-      padding: 8px 14px;
-      font-size: 0.95rem;
-      cursor: pointer;
-      background: #1259c3;
-      color: white;
-      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
-      transition: transform 0.08s ease, box-shadow 0.08s ease, background 0.15s;
-    }
+        .btn-smarty {
+            border-radius: 999px;
+            background: var(--accent);
+            border: none;
+        }
 
-    button.secondary {
-      background: #e0e0e7;
-      color: #222;
-      box-shadow: none;
-    }
+        .btn-smarty:hover {
+            filter: brightness(1.05);
+        }
 
-    button:hover {
-      transform: translateY(-1px);
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.16);
-      background: #0d47a1;
-    }
+        .btn-smarty-secondary {
+            border-radius: 999px;
+        }
 
-    button.secondary:hover {
-      background: #d0d0dd;
-      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
-    }
+        .alert-msg {
+            margin-top: 0.4rem;
+            font-size: 0.9rem;
+        }
 
-    canvas {
-      margin-top: 10px;
-      width: 100%;
-      max-width: 820px;
-      border-radius: 10px;
-      background: #fafbff;
-      border: 1px solid #dde2f0;
-    }
+        .alert-error {
+            color: var(--error);
+        }
 
-    .result {
-      margin-top: 10px;
-      font-size: 1rem;
-      font-weight: 600;
-    }
+        .alert-ok {
+            color: var(--ok);
+        }
 
-    .result span {
-      font-variant-numeric: tabular-nums;
-      padding: 2px 6px;
-      border-radius: 6px;
-      background: #eef3ff;
-      color: #0d47a1;
-      margin-left: 4px;
-    }
+        /* Risultato + spiegazione */
+        .result-box {
+            margin-top: 0.75rem;
+            padding: 0.8rem 0.9rem;
+            border-radius: 0.6rem;
+            background: var(--accent-soft);
+        }
 
-    .explanation {
-      margin-top: 6px;
-      font-size: 0.9rem;
-      color: #444;
-      background: #f8fafc;
-      border-radius: 10px;
-      padding: 8px 10px;
-      border: 1px solid #dde2f0;
-    }
+        .result-main {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 0.3rem;
+        }
 
-    .pill {
-      display: inline-block;
-      padding: 2px 8px;
-      border-radius: 999px;
-      font-size: 0.8rem;
-      margin-top: 2px;
-    }
+        .result-main span {
+            font-size: 1.5rem;
+        }
 
-    .pill.plus {
-      background: #e3f2fd;
-      color: #0d47a1;
-    }
+        .result-explanation {
+            font-size: 0.95rem;
+        }
 
-    .pill.minus {
-      background: #ffebee;
-      color: #b71c1c;
-    }
+        /* Linea dei numeri */
+        .numberline-container {
+            margin-top: 0.6rem;
+        }
 
-    @media (max-width: 600px) {
-      h1 {
-        font-size: 1.35rem;
-      }
-      .card {
-        padding: 14px 10px 16px;
-      }
-      button {
-        flex: 1 1 calc(50% - 8px);
-        text-align: center;
-      }
-    }
-  </style>
+        .numberline-label {
+            font-size: 0.9rem;
+            color: var(--text-soft);
+            margin-bottom: 0.4rem;
+        }
+
+        .numberline {
+            position: relative;
+            padding: 2.2rem 0.75rem 0.75rem; /* più alta */
+            border-radius: 0.75rem;
+            background: #edf2f7;
+            overflow-x: auto;
+            min-height: 140px; /* altezza minima più generosa */
+        }
+
+        .line-base {
+            position: relative;
+            height: 2px;
+            background: #a0aec0;
+            margin: 0 0.5rem;
+        }
+
+        .ticks {
+            display: flex;
+            justify-content: space-between;
+            position: relative;
+            margin-top: 0.7rem;
+            padding: 0 0.25rem;
+        }
+
+        .tick {
+            position: relative;
+            flex: 1 0 0;
+            text-align: center;
+            font-size: 0.7rem;
+            color: #4a5568;
+            padding-top: 0.4rem;
+        }
+
+        .tick::before {
+            content: "";
+            position: absolute;
+            top: -0.7rem;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 1px;
+            height: 12px;
+            background: #4a5568;
+        }
+
+        .tick.zero::before {
+            height: 18px;
+            background: #2d3748;
+        }
+
+        .tick.zero {
+            font-weight: 700;
+            color: #2d3748;
+        }
+
+        .tick.strong::before {
+            height: 16px;
+        }
+
+        /* Marker partenza/arrivo – agganciati al tick per essere precisi */
+        .marker {
+            position: absolute;
+            top: -1.6rem;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 0.1rem 0.3rem;
+            border-radius: 999px;
+            font-size: 0.7rem;
+            white-space: nowrap;
+        }
+
+        .marker-start {
+            background: #fed7e2;
+            color: #b83280;
+        }
+
+        .marker-end {
+            background: #c6f6d5;
+            color: #22543d;
+        }
+
+        .marker-dot {
+            position: absolute;
+            top: -0.5rem;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 10px;
+            height: 10px;
+            border-radius: 999px;
+            background: #2b6cb0;
+            box-shadow: 0 0 0 2px rgba(66, 153, 225, 0.4);
+        }
+    </style>
 </head>
 <body>
-  <div class="container">
-    <h1>Somma e sottrazione con numeri relativi</h1>
-    <p>
-      Qui puoi allenarti con la <strong>somma</strong> e la
-      <strong>sottrazione</strong> di numeri con il segno.
-    </p>
-    <p>
-      Scegli due numeri (positivi o negativi), poi premi
-      <strong>Somma</strong> oppure <strong>Sottrazione</strong>.
-      Guarda il risultato e come si posiziona sulla linea.
-    </p>
+    <div class="container py-4">
+        <header class="text-center mb-4">
+            <h1 class="h3 mb-1">Somma e sottrazione con i numeri relativi</h1>
+            <p class="text-muted mb-0">
+                Allenati a usare la linea dei numeri da −20 a +20, passo dopo passo.
+            </p>
+        </header>
 
-    <div class="card">
-      <h2>Imposta i numeri</h2>
+        <div class="row g-4">
+            <!-- Colonna sinistra: input e comandi -->
+            <div class="col-12 col-lg-5">
+                <section class="sm-card" aria-label="Area di inserimento dei numeri">
+                    <h2>1. Scegli l'operazione</h2>
+                    <p class="hint">
+                        Scrivi i numeri (da −10 a +10) e scegli se vuoi sommare oppure sottrarre.
+                    </p>
 
-      <div class="inputs-row">
-        <div>
-          <label for="a"><strong>Primo numero (a):</strong></label><br />
-          <input type="number" id="a" value="2" min="-10" max="10" />
+                    <div class="row g-3 mb-2">
+                        <div class="col-12 col-md-4">
+                            <label for="firstNumber" class="form-label">
+                                Primo numero
+                            </label>
+                            <input type="number" class="form-control"
+                                   id="firstNumber" min="-10" max="10" step="1" />
+                        </div>
+
+                        <div class="col-12 col-md-4">
+                            <label for="operation" class="form-label">
+                                Operazione
+                            </label>
+                            <select id="operation" class="form-select">
+                                <option value="+">+</option>
+                                <option value="-">−</option>
+                            </select>
+                        </div>
+
+                        <div class="col-12 col-md-4">
+                            <label for="secondNumber" class="form-label">
+                                Secondo numero
+                            </label>
+                            <input type="number" class="form-control"
+                                   id="secondNumber" min="-10" max="10" step="1" />
+                        </div>
+                    </div>
+
+                    <div class="d-flex flex-wrap gap-2 mt-1">
+                        <button class="btn btn-smarty text-white px-3" id="btnCalculate">
+                            Calcola sulla linea
+                        </button>
+                        <button class="btn btn-outline-secondary btn-smarty-secondary px-3" id="btnReset" type="button">
+                            Pulisci
+                        </button>
+                    </div>
+
+                    <div id="inputMessage" class="alert-msg" aria-live="polite"></div>
+                </section>
+            </div>
+
+            <!-- Colonna destra: linea dei numeri + risultato -->
+            <div class="col-12 col-lg-7">
+                <section class="sm-card" aria-label="Linea dei numeri e spiegazione visiva">
+                    <h2>2. Guarda il movimento sulla linea dei numeri</h2>
+                    <p class="hint">
+                        La linea va da −20 a +20. Il punto di partenza e il risultato sono evidenziati.
+                    </p>
+
+                    <div class="numberline-container">
+                        <div class="numberline-label">
+                            Linea dei numeri (da −20 a +20)
+                        </div>
+                        <div class="numberline" id="numberline" aria-label="Linea dei numeri da -20 a +20">
+                            <div class="line-base" id="lineBase"></div>
+                            <div class="ticks" id="ticksContainer">
+                                <!-- tick generati via JavaScript -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="result-box" id="resultBox" style="display:none;">
+                        <div class="result-main" id="resultMain"></div>
+                        <div class="result-explanation" id="resultExplanation"></div>
+                    </div>
+
+                    <div id="lineMessage" class="alert-msg" aria-live="polite"></div>
+                </section>
+            </div>
         </div>
-        <div>
-          <label for="b"><strong>Secondo numero (b):</strong></label><br />
-          <input type="number" id="b" value="-3" min="-10" max="10" />
-        </div>
-      </div>
-
-      <div class="buttons-row">
-        <button type="button" id="btnSomma">Calcola somma (a + b)</button>
-        <button type="button" id="btnSottrazione">Calcola sottrazione (a − b)</button>
-        <button type="button" id="btnReset" class="secondary">Torna a 0</button>
-      </div>
-
-      <p class="result">
-        Risultato:
-        <span id="risultato">0</span>
-      </p>
-      <p>
-        <span class="pill plus">positivo → a destra</span>
-        <span class="pill.minus">negativo → a sinistra</span>
-      </p>
-
-      <canvas id="numberLine" width="820" height="190"></canvas>
-
-      <div class="explanation" id="explanation">
-        Scegli due numeri e premi uno dei pulsanti per vedere il risultato.
-      </div>
     </div>
-  </div>
 
-  <script>
-    const canvas = document.getElementById("numberLine");
-    const ctx = canvas.getContext("2d");
+    <!-- Bootstrap JS (opzionale ma utile se in futuro usi componenti interattivi) -->
+    <script
+        src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+        crossorigin="anonymous">
+    </script>
 
-    const inputA = document.getElementById("a");
-    const inputB = document.getElementById("b");
-    const btnSomma = document.getElementById("btnSomma");
-    const btnSottrazione = document.getElementById("btnSottrazione");
-    const btnReset = document.getElementById("btnReset");
-    const spanRisultato = document.getElementById("risultato");
-    const explanation = document.getElementById("explanation");
+    <script>
+        (function() {
+            const MIN_VALUE = -20;
+            const MAX_VALUE = 20;
 
-    // Intervallo della linea: deve contenere tutti i risultati possibili
-    // con a, b in [-10, +10] → risultato in [-20, +20].
-    const minN = -20;
-    const maxN = 20;
-    let current = 0;
+            const firstNumberInput = document.getElementById("firstNumber");
+            const secondNumberInput = document.getElementById("secondNumber");
+            const operationSelect = document.getElementById("operation");
+            const btnCalculate = document.getElementById("btnCalculate");
+            const btnReset = document.getElementById("btnReset");
+            const inputMessage = document.getElementById("inputMessage");
+            const lineMessage = document.getElementById("lineMessage");
 
-    function xFor(n) {
-      const padding = 60;
-      const usableWidth = canvas.width - padding * 2;
-      const ratio = (n - minN) / (maxN - minN);
-      return padding + ratio * usableWidth;
-    }
+            const ticksContainer = document.getElementById("ticksContainer");
 
-    function drawNumberLine() {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
+            const resultBox = document.getElementById("resultBox");
+            const resultMain = document.getElementById("resultMain");
+            const resultExplanation = document.getElementById("resultExplanation");
 
-      const padding = 60;
-      const y = canvas.height / 2;
+            // Creazione dinamica dei tick da -20 a +20
+            const positions = [];
+            for (let v = MIN_VALUE; v <= MAX_VALUE; v++) {
+                positions.push(v);
+            }
 
-      // Linea principale
-      ctx.strokeStyle = "#424242";
-      ctx.lineWidth = 2;
-      ctx.beginPath();
-      ctx.moveTo(padding, y);
-      ctx.lineTo(canvas.width - padding, y);
-      ctx.stroke();
+            function buildNumberLine() {
+                ticksContainer.innerHTML = "";
 
-      // Tacche e numeri
-      ctx.font = "14px system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif";
-      ctx.textAlign = "center";
-      ctx.textBaseline = "top";
+                positions.forEach((val) => {
+                    const tick = document.createElement("div");
+                    tick.classList.add("tick");
+                    tick.dataset.value = val.toString();
+                    tick.textContent = val;
 
-      for (let n = minN; n <= maxN; n++) {
-        const x = xFor(n);
+                    if (val === 0) {
+                        tick.classList.add("zero");
+                    }
+                    if (val % 5 === 0 && val !== 0) {
+                        tick.classList.add("strong");
+                    }
 
-        if (n < 0) ctx.strokeStyle = "#c62828";
-        else if (n > 0) ctx.strokeStyle = "#1565c0";
-        else ctx.strokeStyle = "#424242";
+                    ticksContainer.appendChild(tick);
+                });
+            }
 
-        ctx.lineWidth = n === 0 ? 2.2 : 1.4;
+            buildNumberLine();
 
-        ctx.beginPath();
-        const tickHeight = n === 0 ? 14 : 9;
-        ctx.moveTo(x, y - tickHeight / 2);
-        ctx.lineTo(x, y + tickHeight / 2);
-        ctx.stroke();
+            function clearMarkers() {
+                const oldMarkers = ticksContainer.querySelectorAll(".marker, .marker-dot");
+                oldMarkers.forEach(el => el.remove());
+            }
 
-        // Mostro solo i multipli di 5 per non affollare
-        if (n % 5 === 0 || n === 0) {
-          ctx.fillStyle = n < 0 ? "#b71c1c" : n > 0 ? "#0d47a1" : "#000000";
-          ctx.fillText(n.toString(), x, y + 12);
-        }
-      }
+            function placeMarker(value, type) {
+                const tick = ticksContainer.querySelector(`.tick[data-value="${value}"]`);
+                if (!tick) return;
 
-      // Punto del risultato
-      const markerX = xFor(current);
-      const markerY = y;
+                const marker = document.createElement("div");
+                marker.classList.add("marker");
+                const dot = document.createElement("div");
+                dot.classList.add("marker-dot");
 
-      ctx.beginPath();
-      ctx.fillStyle =
-        current < 0 ? "#e53935" : current > 0 ? "#1e88e5" : "#6d4c41";
-      ctx.strokeStyle = "#212121";
-      ctx.lineWidth = 1.5;
-      ctx.arc(markerX, markerY, 8, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.stroke();
+                if (type === "start") {
+                    marker.classList.add("marker-start");
+                    marker.textContent = "Partenza: " + value;
+                } else if (type === "end") {
+                    marker.classList.add("marker-end");
+                    marker.textContent = "Arrivo: " + value;
+                }
 
-      ctx.font =
-        "15px system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif";
-      ctx.textAlign = "center";
-      ctx.textBaseline = "bottom";
-      ctx.fillStyle = "#212121";
-      ctx.fillText(current.toString(), markerX, markerY - 12);
-    }
+                tick.appendChild(marker);
+                tick.appendChild(dot);
+            }
 
-    function computeAndExplain(type) {
-      let a = parseInt(inputA.value, 10);
-      let b = parseInt(inputB.value, 10);
+            function validateInputs(a, b) {
+                if (isNaN(a) || isNaN(b)) {
+                    return "Per favore inserisci due numeri.";
+                }
+                if (a < -10 || a > 10 || b < -10 || b > 10) {
+                    return "I numeri devono essere compresi tra −10 e +10.";
+                }
+                return "";
+            }
 
-      if (isNaN(a)) a = 0;
-      if (isNaN(b)) b = 0;
+            function buildExplanation(a, op, b, result) {
+                let line1 = "Sono partito dal numero " + a + ".";
+                let line2 = "";
+                let line3 = "";
+                let absB = Math.abs(b);
 
-      // limiti degli input: restano -10 / +10,
-      // così il risultato è sempre dentro -20 / +20.
-      if (a < -10) a = -10;
-      if (a > 10) a = 10;
-      if (b < -10) b = -10;
-      if (b > 10) b = 10;
+                if (op === "+") {
+                    if (b >= 0) {
+                        line2 = "Ho aggiunto " + b + ".";
+                        line3 = "Mi sono spostato di " + absB + " passi verso destra e sono arrivato a " + result + ".";
+                    } else {
+                        line2 = "Ho aggiunto un numero negativo (" + b + ").";
+                        line3 = "Aggiungere " + b + " è come sottrarre " + absB + ": mi sposto di " + absB + " passi verso sinistra e arrivo a " + result + ".";
+                    }
+                } else { // op === "-"
+                    if (b >= 0) {
+                        line2 = "Ho sottratto " + b + ".";
+                        line3 = "Mi sono spostato di " + absB + " passi verso sinistra e sono arrivato a " + result + ".";
+                    } else {
+                        line2 = "Ho sottratto un numero negativo (" + b + ").";
+                        line3 = "Sottrarre " + b + " è come aggiungere " + absB + ": mi sposto di " + absB + " passi verso destra e arrivo a " + result + ".";
+                    }
+                }
 
-      inputA.value = a;
-      inputB.value = b;
+                return line1 + "<br>" + line2 + "<br>" + line3;
+            }
 
-      let result;
-      let text = "";
+            function onCalculateClick() {
+                inputMessage.textContent = "";
+                inputMessage.className = "alert-msg";
+                lineMessage.textContent = "";
+                lineMessage.className = "alert-msg";
 
-      if (type === "somma") {
-        result = a + b;
-        text += `Hai calcolato: ${a} + (${b}) = ${result}. `;
-      } else {
-        result = a - b;
-        text += `Hai calcolato: ${a} − (${b}) = ${result}. `;
-      }
+                const a = parseInt(firstNumberInput.value, 10);
+                const b = parseInt(secondNumberInput.value, 10);
+                const op = operationSelect.value;
 
-      const signA = Math.sign(a);
-      const signB = Math.sign(b);
+                const error = validateInputs(a, b);
+                if (error) {
+                    inputMessage.textContent = error;
+                    inputMessage.classList.add("alert-error");
+                    resultBox.style.display = "none";
+                    clearMarkers();
+                    return;
+                }
 
-      if (type === "somma") {
-        if (signA === 0 && signB === 0) {
-          text += "Tutti e due i numeri sono 0.";
-        } else if (signA === signB) {
-          text += "Hanno lo stesso segno: sommi i numeri senza il segno e mantieni quel segno.";
-        } else {
-          text += "Hanno segno diverso: confronti le distanze da 0 e prendi il segno del numero più “forte”.";
-        }
-      } else {
-        text += "Nella sottrazione puoi pensare che cambi il segno al secondo numero e poi fai una somma.";
-      }
+                let result;
+                if (op === "+") {
+                    result = a + b;
+                } else {
+                    result = a - b;
+                }
 
-      // ora il risultato NON viene limitato a ±10,
-      // ma solo al range della linea: [-20, +20]
-      if (result < minN) result = minN;
-      if (result > maxN) result = maxN;
+                if (result < MIN_VALUE || result > MAX_VALUE) {
+                    lineMessage.textContent = "Il risultato esce dalla linea dei numeri.";
+                    lineMessage.classList.add("alert-error");
+                }
 
-      current = result;
-      spanRisultato.textContent = result.toString();
-      explanation.textContent = text;
-      drawNumberLine();
-    }
+                resultMain.innerHTML = 'Risultato: <span>' + result + "</span>";
+                resultExplanation.innerHTML = buildExplanation(a, op, b, result);
+                resultBox.style.display = "block";
 
-    btnSomma.addEventListener("click", () => {
-      computeAndExplain("somma");
-    });
+                clearMarkers();
+                placeMarker(a, "start");
+                placeMarker(result, "end");
 
-    btnSottrazione.addEventListener("click", () => {
-      computeAndExplain("sottrazione");
-    });
+                inputMessage.textContent = "Operazione eseguita! Osserva la linea dei numeri.";
+                inputMessage.classList.add("alert-ok");
+            }
 
-    btnReset.addEventListener("click", () => {
-      current = 0;
-      spanRisultato.textContent = "0";
-      explanation.textContent = "Scegli due numeri e premi uno dei pulsanti per vedere il risultato.";
-      drawNumberLine();
-    });
+            function onResetClick() {
+                firstNumberInput.value = "";
+                secondNumberInput.value = "";
+                operationSelect.value = "+";
+                inputMessage.textContent = "";
+                inputMessage.className = "alert-msg";
+                lineMessage.textContent = "";
+                lineMessage.className = "alert-msg";
+                clearMarkers();
+                resultBox.style.display = "none";
+            }
 
-    drawNumberLine();
-  </script>
+            btnCalculate.addEventListener("click", onCalculateClick);
+            btnReset.addEventListener("click", onResetClick);
+        })();
+    </script>
 </body>
 </html>
