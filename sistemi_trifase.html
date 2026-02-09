@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema Trifase - Visualizzatore Interattivo</title>
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect, useRef } = React;
+
+        const SistemaTrifase = () => {
+            const [frequenza, setFrequenza] = useState(1);
+            const [ampiezza, setAmpiezza] = useState(100);
+            const [configurazione, setConfigurazione] = useState('stella');
+            const [tempo, setTempo] = useState(0);
+            const [isAnimating, setIsAnimating] = useState(true);
+            const [mostraVettori, setMostraVettori] = useState(true);
+            const [mostraForme, setMostraForme] = useState(true);
+            const [velocita, setVelocita] = useState(1);
+
+            const canvasVettoriRef = useRef(null);
+            const canvasFormeRef = useRef(null);
+
+            // Animazione temporale
+            useEffect(() => {
+                if (!isAnimating) return;
+                
+                const interval = setInterval(() => {
+                    setTempo(t => (t + 0.02 * velocita) % (2 * Math.PI / (2 * Math.PI * frequenza)));
+                }, 20);
+
+                return () => clearInterval(interval);
+            }, [isAnimating, velocita, frequenza]);
+
+            // Disegna vettori rotanti
+            useEffect(() => {
+                if (!mostraVettori) return;
+                
+                const canvas = canvasVettoriRef.current;
+                if (!canvas) return;
+                
+                const ctx = canvas.getContext('2d');
+                const centerX = canvas.width / 2;
+                const centerY = canvas.height / 2;
+                const scale = 1.5;
+
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+                // Assi
+                ctx.strokeStyle = '#e0e0e0';
+                ctx.lineWidth = 1;
+                ctx.beginPath();
+                ctx.moveTo(0, centerY);
+                ctx.lineTo(canvas.width, centerY);
+                ctx.moveTo(centerX, 0);
+                ctx.lineTo(centerX, canvas.height);
+                ctx.stroke();
+
+                // Circonferenza
+                ctx.strokeStyle = '#f0f0f0';
+                ctx.beginPath();
+                ctx.arc(centerX, centerY, ampiezza * scale, 0, 2 * Math.PI);
+                ctx.stroke();
+
+                const omega = 2 * Math.PI * frequenza;
+                const theta = omega * tempo;
+
+                const colori = ['#e74c3c', '#2ecc71', '#3498db'];
+                const fasi = [0, -2*Math.PI/3, -4*Math.PI/3];
+                const etichette = ['R', 'S', 'T'];
+
+                // Vettori
+                fasi.forEach((fase, i) => {
+                    const angolo = theta + fase;
+                    const x = centerX + ampiezza * scale * Math.cos(angolo);
+                    const y = centerY - ampiezza * scale * Math.sin(angolo);
+
+                    ctx.strokeStyle = colori[i];
+                    ctx.lineWidth = 3;
+                    ctx.beginPath();
+                    ctx.moveTo(centerX, centerY);
+                    ctx.lineTo(x, y);
+                    ctx.stroke();
+
+                    // Freccia
+                    const arrowLength = 15;
+                    const arrowAngle = Math.PI / 6;
+                    ctx.beginPath();
+                    ctx.moveTo(x, y);
+                    ctx.lineTo(
+                        x - arrowLength * Math.cos(angolo - arrowAngle),
+                        y + arrowLength * Math.sin(angolo - arrowAngle)
+                    );
+                    ctx.moveTo(x, y);
+                    ctx.lineTo(
+                        x - arrowLength * Math.cos(angolo + arrowAngle),
+                        y + arrowLength * Math.sin(angolo + arrowAngle)
+                    );
+                    ctx.stroke();
+
+                    // Etichetta
+                    ctx.fillStyle = colori[i];
+                    ctx.font = 'bold 16px Arial';
+                    ctx.fillText(etichette[i], x + 10, y - 10);
+
+                    // Proiezione
+                    ctx.strokeStyle = colori[i];
+                    ctx.lineWidth = 1;
+                    ctx.setLineDash([5, 5]);
+                    ctx.beginPath();
+                    ctx.moveTo(x, y);
+                    ctx.lineTo(x, centerY);
+                    ctx.stroke();
+                    ctx.setLineDash([]);
+                });
+
+                // Vettori concatenati per triangolo
+                if (configurazione === 'triangolo') {
+                    ctx.lineWidth = 2;
+                    ctx.setLineDash([3, 3]);
+                    
+                    const xRS = centerX + (ampiezza * scale * Math.sqrt(3)) * Math.cos(theta + Math.PI/6);
+                    const yRS = centerY - (ampiezza * scale * Math.sqrt(3)) * Math.sin(theta + Math.PI/6);
+                    
+                    ctx.strokeStyle = '#9b59b6';
+                    ctx.beginPath();
+                    ctx.moveTo(centerX, centerY);
+                    ctx.lineTo(xRS, yRS);
+                    ctx.stroke();
+                    
+                    ctx.fillStyle = '#9b59b6';
+                    ctx.font = '14px Arial';
+                    ctx.fillText('VRS', xRS + 10, yRS);
+                    
+                    ctx.setLineDash([]);
+                }
+
+            }, [tempo, ampiezza, frequenza, configurazione, mostraVettori]);
+
+            // Disegna forme d'onda
+            useEffect(() => {
+                if (!mostraForme) return;
+                
+                const canvas = canvasFormeRef.current;
+                if (!canvas) return;
+                
+                const ctx = canvas.getContext('2d');
+                const width = canvas.width;
+                const height = canvas.height;
+                const centerY = height / 2;
+
+                ctx.clearRect(0, 0, width, height);
+
+                // Assi
+                ctx.strokeStyle = '#e0e0e0';
+                ctx.lineWidth = 1;
+                ctx.beginPath();
+                ctx.moveTo(0, centerY);
+                ctx.lineTo(width, centerY);
+                ctx.stroke();
+
+                // Griglia
+                ctx.strokeStyle = '#f5f5f5';
+                for (let i = 0; i <= 4; i++) {
+                    const x = (width / 4) * i;
+                    ctx.beginPath();
+                    ctx.moveTo(x, 0);
+                    ctx.lineTo(x, height);
+                    ctx.stroke();
+                }
+
+                const omega = 2 * Math.PI * frequenza;
+                const colori = ['#e74c3c', '#2ecc71', '#3498db'];
+                const fasi = [0, -2*Math.PI/3, -4*Math.PI/3];
+                const etichette = ['R', 'S', 'T'];
+                const scale = (height / 2 - 20) / ampiezza;
+
+                // Forme d'onda
+                fasi.forEach((fase, i) => {
+                    ctx.strokeStyle = colori[i];
+                    ctx.lineWidth = 2;
+                    ctx.beginPath();
+
+                    for (let x = 0; x < width; x++) {
+                        const t = (x / width) * (2 / frequenza);
+                        const y = centerY - ampiezza * scale * Math.sin(omega * t + fase);
+                        
+                        if (x === 0) {
+                            ctx.moveTo(x, y);
+                        } else {
+                            ctx.lineTo(x, y);
+                        }
+                    }
+                    ctx.stroke();
+
+                    // Etichetta
+                    ctx.fillStyle = colori[i];
+                    ctx.font = 'bold 14px Arial';
+                    ctx.fillText(etichette[i], width - 30, centerY - ampiezza * scale * Math.sin(fase) - 10);
+                });
+
+                // Indicatore tempo
+                const currentX = ((omega * tempo) % (2 * Math.PI)) / (2 * Math.PI) * (width / 2);
+                ctx.strokeStyle = '#f39c12';
+                ctx.lineWidth = 2;
+                ctx.setLineDash([5, 5]);
+                ctx.beginPath();
+                ctx.moveTo(currentX, 0);
+                ctx.lineTo(currentX, height);
+                ctx.stroke();
+                ctx.setLineDash([]);
+
+                // Punti correnti
+                fasi.forEach((fase, i) => {
+                    const y = centerY - ampiezza * scale * Math.sin(omega * tempo + fase);
+                    ctx.fillStyle = colori[i];
+                    ctx.beginPath();
+                    ctx.arc(currentX, y, 5, 0, 2 * Math.PI);
+                    ctx.fill();
+                });
+
+            }, [tempo, ampiezza, frequenza, mostraForme]);
+
+            // Valori istantanei
+            const omega = 2 * Math.PI * frequenza;
+            const vR = ampiezza * Math.sin(omega * tempo);
+            const vS = ampiezza * Math.sin(omega * tempo - 2*Math.PI/3);
+            const vT = ampiezza * Math.sin(omega * tempo - 4*Math.PI/3);
+            const vConcatenata = ampiezza * Math.sqrt(3);
+
+            return (
+                <div style={{ 
+                    fontFamily: 'Arial, sans-serif', 
+                    padding: '20px',
+                    maxWidth: '1400px',
+                    margin: '0 auto',
+                    background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                    minHeight: '100vh'
+                }}>
+                    <div style={{
+                        background: 'white',
+                        borderRadius: '15px',
+                        padding: '30px',
+                        boxShadow: '0 10px 40px rgba(0,0,0,0.2)'
+                    }}>
+                        <h1 style={{ 
+                            textAlign: 'center', 
+                            color: '#2c3e50',
+                            marginBottom: '10px',
+                            fontSize: '32px'
+                        }}>
+                            Sistema Trifase - Visualizzatore Interattivo
+                        </h1>
+                        <p style={{
+                            textAlign: 'center',
+                            color: '#7f8c8d',
+                            marginBottom: '30px',
+                            fontSize: '14px'
+                        }}>
+                            Manutenzione e Assistenza Tecnica - Classe 4°
+                        </p>
+
+                        {/* Controlli */}
+                        <div style={{
+                            display: 'grid',
+                            gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
+                            gap: '20px',
+                            marginBottom: '30px',
+                            padding: '20px',
+                            background: '#f8f9fa',
+                            borderRadius: '10px'
+                        }}>
+                            <div>
+                                <label style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold', color: '#34495e' }}>
+                                    Frequenza: {frequenza} Hz
+                                </label>
+                                <input
+                                    type="range"
+                                    min="0.5"
+                                    max="3"
+                                    step="0.1"
+                                    value={frequenza}
+                                    onChange={(e) => setFrequenza(parseFloat(e.target.value))}
+                                    style={{ width: '100%' }}
+                                />
+                            </div>
+
+                            <div>
+                                <label style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold', color: '#34495e' }}>
+                                    Tensione di fase: {ampiezza} V
+                                </label>
+                                <input
+                                    type="range"
+                                    min="50"
+                                    max="230"
+                                    step="10"
+                                    value={ampiezza}
+                                    onChange={(e) => setAmpiezza(parseInt(e.target.value))}
+                                    style={{ width: '100%' }}
+                                />
+                            </div>
+
+                            <div>
+                                <label style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold', color: '#34495e' }}>
+                                    Velocità animazione: {velocita}x
+                                </label>
+                                <input
+                                    type="range"
+                                    min="0.1"
+                                    max="3"
+                                    step="0.1"
+                                    value={velocita}
+                                    onChange={(e) => setVelocita(parseFloat(e.target.value))}
+                                    style={{ width: '100%' }}
+                                />
+                            </div>
+
+                            <div>
+                                <label style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold', color: '#34495e' }}>
+                                    Configurazione
+                                </label>
+                                <select
+                                    value={configurazione}
+                                    onChange={(e) => setConfigurazione(e.target.value)}
+                                    style={{
+                                        width: '100%',
+                                        padding: '8px',
+                                        borderRadius: '5px',
+                                        border: '2px solid #ddd',
+                                        fontSize: '16px'
+                                    }}
+                                >
+                                    <option value="stella">Stella (Y)</option>
+                                    <option value="triangolo">Triangolo (Δ)</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        {/* Pulsanti */}
+                        <div style={{
+                            display: 'flex',
+                            gap: '10px',
+                            justifyContent: 'center',
+                            marginBottom: '30px',
+                            flexWrap: 'wrap'
+                        }}>
+                            <button
+                                onClick={() => setIsAnimating(!isAnimating)}
+                                style={{
+                                    padding: '12px 24px',
+                                    fontSize: '16px',
+                                    fontWeight: 'bold',
+                                    border: 'none',
+                                    borderRadius: '8px',
+                                    cursor: 'pointer',
+                                    background: isAnimating ? '#e74c3c' : '#27ae60',
+                                    color: 'white',
+                                    boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
+                                    transition: 'all 0.3s'
+                                }}
+                            >
+                                {isAnimating ? '⏸ Pausa' : '▶ Avvia'}
+                            </button>
+                            
+                            <button
+                                onClick={() => setTempo(0)}
+                                style={{
+                                    padding: '12px 24px',
+                                    fontSize: '16px',
+                                    fontWeight: 'bold',
+                                    border: 'none',
+                                    borderRadius: '8px',
+                                    cursor: 'pointer',
+                                    background: '#3498db',
+                                    color: 'white',
+                                    boxShadow: '0 4px 6px rgba(0,0,0,0.1)'
+                                }}
+                            >
+                                ⏮ Reset
+                            </button>
+
+                            <button
+                                onClick={() => setMostraVettori(!mostraVettori)}
+                                style={{
+                                    padding: '12px 24px',
+                                    fontSize: '16px',
+                                    fontWeight: 'bold',
+                                    border: 'none',
+                                    borderRadius: '8px',
+                                    cursor: 'pointer',
+                                    background: mostraVettori ? '#9b59b6' : '#95a5a6',
+                                    color: 'white',
+                                    boxShadow: '0 4px 6px rgba(0,0,0,0.1)'
+                                }}
+                            >
+                                {mostraVettori ? '👁 Nascondi' : '👁 Mostra'} Vettori
+                            </button>
+
+                            <button
+                                onClick={() => setMostraForme(!mostraForme)}
+                                style={{
+                                    padding: '12px 24px',
+                                    fontSize: '16px',
+                                    fontWeight: 'bold',
+                                    border: 'none',
+                                    borderRadius: '8px',
+                                    cursor: 'pointer',
+                                    background: mostraForme ? '#e67e22' : '#95a5a6',
+                                    color: 'white',
+                                    boxShadow: '0 4px 6px rgba(0,0,0,0.1)'
+                                }}
+                            >
+                                {mostraForme ? '📊 Nascondi' : '📊 Mostra'} Forme d'onda
+                            </button>
+                        </div>
+
+                        {/* Canvas */}
+                        <div style={{
+                            display: 'grid',
+                            gridTemplateColumns: mostraVettori && mostraForme ? '1fr 1fr' : '1fr',
+                            gap: '20px',
+                            marginBottom: '30px'
+                        }}>
+                            {mostraVettori && (
+                                <div style={{
+                                    background: 'white',
+                                    padding: '15px',
+                                    borderRadius: '10px',
+                                    border: '2px solid #ecf0f1',
+                                    boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
+                                }}>
+                                    <h3 style={{ textAlign: 'center', color: '#2c3e50', marginBottom: '15px' }}>
+                                        Vettori Rotanti
+                                    </h3>
+                                    <canvas
+                                        ref={canvasVettoriRef}
+                                        width={500}
+                                        height={500}
+                                        style={{ 
+                                            width: '100%', 
+                                            height: 'auto',
+                                            border: '1px solid #ecf0f1',
+                                            borderRadius: '8px'
+                                        }}
+                                    />
+                                </div>
+                            )}
+
+                            {mostraForme && (
+                                <div style={{
+                                    background: 'white',
+                                    padding: '15px',
+                                    borderRadius: '10px',
+                                    border: '2px solid #ecf0f1',
+                                    boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
+                                }}>
+                                    <h3 style={{ textAlign: 'center', color: '#2c3e50', marginBottom: '15px' }}>
+                                        Forme d'Onda nel Tempo
+                                    </h3>
+                                    <canvas
+                                        ref={canvasFormeRef}
+                                        width={800}
+                                        height={400}
+                                        style={{ 
+                                            width: '100%', 
+                                            height: 'auto',
+                                            border: '1px solid #ecf0f1',
+                                            borderRadius: '8px'
+                                        }}
+                                    />
+                                </div>
+                            )}
+                        </div>
+
+                        {/* Valori istantanei */}
+                        <div style={{
+                            background: '#f8f9fa',
+                            padding: '20px',
+                            borderRadius: '10px',
+                            marginBottom: '20px'
+                        }}>
+                            <h3 style={{ color: '#2c3e50', marginBottom: '15px' }}>Valori Istantanei</h3>
+                            <div style={{
+                                display: 'grid',
+                                gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))',
+                                gap: '15px'
+                            }}>
+                                <div style={{ textAlign: 'center' }}>
+                                    <div style={{ fontSize: '14px', color: '#7f8c8d', marginBottom: '5px' }}>Fase R</div>
+                                    <div style={{ fontSize: '24px', fontWeight: 'bold', color: '#e74c3c' }}>
+                                        {vR.toFixed(1)} V
+                                    </div>
+                                </div>
+                                <div style={{ textAlign: 'center' }}>
+                                    <div style={{ fontSize: '14px', color: '#7f8c8d', marginBottom: '5px' }}>Fase S</div>
+                                    <div style={{ fontSize: '24px', fontWeight: 'bold', color: '#2ecc71' }}>
+                                        {vS.toFixed(1)} V
+                                    </div>
+                                </div>
+                                <div style={{ textAlign: 'center' }}>
+                                    <div style={{ fontSize: '14px', color: '#7f8c8d', marginBottom: '5px' }}>Fase T</div>
+                                    <div style={{ fontSize: '24px', fontWeight: 'bold', color: '#3498db' }}>
+                                        {vT.toFixed(1)} V
+                                    </div>
+                                </div>
+                                <div style={{ textAlign: 'center' }}>
+                                    <div style={{ fontSize: '14px', color: '#7f8c8d', marginBottom: '5px' }}>
+                                        Tensione concatenata
+                                    </div>
+                                    <div style={{ fontSize: '24px', fontWeight: 'bold', color: '#9b59b6' }}>
+                                        {vConcatenata.toFixed(1)} V
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Info didattiche */}
+                        <div style={{
+                            background: '#e8f4f8',
+                            padding: '20px',
+                            borderRadius: '10px',
+                            border: '2px solid #3498db'
+                        }}>
+                            <h3 style={{ color: '#2c3e50', marginBottom: '15px' }}>
+                                ℹ️ Configurazione {configurazione === 'stella' ? 'Stella (Y)' : 'Triangolo (Δ)'}
+                            </h3>
+                            {configurazione === 'stella' ? (
+                                <div style={{ color: '#34495e', lineHeight: '1.8' }}>
+                                    <p style={{ marginBottom: '10px' }}>
+                                        <strong>Collegamento a Stella:</strong>
+                                    </p>
+                                    <ul style={{ marginLeft: '20px' }}>
+                                        <li>Le tre fasi sono sfasate di 120° (2π/3 radianti)</li>
+                                        <li>Tensione di fase (Vf) = {ampiezza} V</li>
+                                        <li>Tensione concatenata (Vc) = Vf × √3 = {vConcatenata.toFixed(1)} V</li>
+                                        <li>Il punto neutro (N) è comune a tutte le fasi</li>
+                                        <li>Corrente di linea = Corrente di fase</li>
+                                    </ul>
+                                </div>
+                            ) : (
+                                <div style={{ color: '#34495e', lineHeight: '1.8' }}>
+                                    <p style={{ marginBottom: '10px' }}>
+                                        <strong>Collegamento a Triangolo:</strong>
+                                    </p>
+                                    <ul style={{ marginLeft: '20px' }}>
+                                        <li>Tensione concatenata = Tensione di fase = {ampiezza} V</li>
+                                        <li>Non esiste punto neutro</li>
+                                        <li>Corrente di linea (Il) = If × √3</li>
+                                        <li>Le tensioni concatenate (VRS, VST, VTR) sono sfasate di 120°</li>
+                                        <li>Utilizzato per carichi equilibrati di potenza elevata</li>
+                                    </ul>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        // Render
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<SistemaTrifase />);
+    </script>
+</body>
+</html>
